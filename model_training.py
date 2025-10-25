@@ -13,7 +13,7 @@ def train_model_final(X_train: pd.Series, y_train: pd.Series):
                 "tfidf",
                 TfidfVectorizer(
                     ngram_range=(1, 2),
-                    min_df=5,
+                    min_df=4e-5,
                     max_df=0.9,
                     sublinear_tf=True,
                     strip_accents="unicode",
@@ -47,12 +47,7 @@ def train_model_parameters_experimentation(X_train: pd.Series, y_train: pd.Serie
             (
                 "tfidf",
                 TfidfVectorizer(
-                    ngram_range=(1, 2),
-                    min_df=5,
-                    max_df=0.9,
-                    sublinear_tf=True,
                     strip_accents="unicode",
-                    max_features=100_000,
                     dtype=np.float32,
                 ),
             ),
@@ -66,7 +61,15 @@ def train_model_parameters_experimentation(X_train: pd.Series, y_train: pd.Serie
     )
 
     # parameter variations to test
-    param_grid = {"clf__penalty": ["l2"], "clf__C": [0.5, 1.0, 2.0]}
+    param_grid = {
+        "clf__penalty": ["l2"],
+        "clf__C": [3.0],
+        "tfidf__min_df": [4e-5],
+        "tfidf__max_df": [0.9],
+        "tfidf__ngram_range": [(1, 2)],
+        "tfidf__max_features": [None],
+        "tfidf__sublinear_tf": [True],
+    }
 
     # Cross-validation strategy : divide training data in 5 folds and cross-validate
     cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=None)
