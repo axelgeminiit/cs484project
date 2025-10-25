@@ -5,6 +5,9 @@ import preprocessing as pr
 import model_training as mt
 import model_evaluation as me
 
+SUBSAMPLE = 50000
+DROP3STARS = True
+
 # Download dataset
 path = kagglehub.dataset_download("snap/amazon-fine-food-reviews")
 print("Path to dataset files:", path)
@@ -18,11 +21,12 @@ df.to_csv(out_original_csv, index=False)
 print(f"Saved: {out_csv}")
 
 # Preprocess the dataset
-X, y = pr.prepareDataset(df, drop3Stars=False, subSample=5000)
+X, y = pr.prepareDataset(df, drop3Stars=DROP3STARS, subSample=SUBSAMPLE)
 
 # Train the model
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, stratify=y)
-model = mt.train_model(X_train, y_train)
+# model = mt.train_model_parameters_experimentation(X_train, y_train)
+model = mt.train_model_final(X_train, y_train)
 
 # Evaluate the model
 y_pred = model.predict(X_test)
