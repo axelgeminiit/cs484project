@@ -115,19 +115,6 @@ You can modify the following parameters in `main.py`:
 - Python 3.8+
 - See `requirements.txt` for package dependencies
 
-## Demo for Professor
-
-To demonstrate this project:
-
-1. Ensure the model is trained (run `python main.py` if needed)
-2. Launch the Streamlit app: `streamlit run app.py`
-3. Show the interactive interface and try different reviews
-4. Explain the model architecture and preprocessing steps
-5. Show the performance metrics in the sidebar
-
-## Authors
-
-CS484 Machine Learning Project
 
 ## License
 
