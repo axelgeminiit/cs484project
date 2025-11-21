@@ -19,8 +19,8 @@ custom_model = joblib.load("data/amazon_sentiment_lr_model.joblib")
 # BERT-based model
 bert_model = pipeline(
     "sentiment-analysis",
-    model="distilbert-base-uncased-finetuned-sst-2-english",
-    device=-1,  # Use CPU; change to 0 for GPU
+    model="LiYuan/amazon-review-sentiment-analysis",
+    device=1,
 )
 
 # VADER rule-based sentiment analysis, specialy tuned on social media
@@ -34,7 +34,13 @@ def predict_custom(texts):
 
 def predict_bert(texts):
     results = bert_model(list(texts), truncation=True, max_length=512)
-    predictions = [1 if r["label"] == "POSITIVE" else 0 for r in results]
+    predictions = []
+    for r in results:
+        stars = int(r["label"].split()[0])
+        predictions.append(
+            1 if stars >= 4 else 0
+        )  # note: 3-star reviews have been dropped during preprocessing anyway
+
     return np.array(predictions)
 
 
@@ -50,7 +56,6 @@ def predict_textblob(texts):
     predictions = []
     for text in texts:
         blob = TextBlob(str(text))
-        # polarity: > 0 is positive, <= 0 is negative
         predictions.append(1 if blob.sentiment.polarity > 0 else 0)
     return np.array(predictions)
 
@@ -69,6 +74,7 @@ def compare_all(X_test: pd.Series, y_test: pd.Series):
 
     results = {}
 
+    print("> predicting using custom model...")
     ## custom model
     predictions = predict_custom(X_test)
     accuracy = accuracy_score(y_test, predictions)
@@ -79,9 +85,12 @@ def compare_all(X_test: pd.Series, y_test: pd.Series):
         "f1_score": f1,
         "predictions": predictions,
     }
+    print("> custom model prediction done.")
 
     ## BERT model
+    print("> predicting using BERT model...")
     predictions = predict_bert(X_test)
+
     accuracy = accuracy_score(y_test, predictions)
     f1 = f1_score(y_test, predictions)
 
@@ -90,8 +99,10 @@ def compare_all(X_test: pd.Series, y_test: pd.Series):
         "f1_score": f1,
         "predictions": predictions,
     }
+    print("> BERT model prediction done.")
 
     ## vader model
+    print("> predicting using VADER model...")
     predictions = predict_vader(X_test)
     accuracy = accuracy_score(y_test, predictions)
     f1 = f1_score(y_test, predictions)
@@ -101,8 +112,10 @@ def compare_all(X_test: pd.Series, y_test: pd.Series):
         "f1_score": f1,
         "predictions": predictions,
     }
+    print("> VADER model prediction done.")
 
     ## textblob model
+    print("> predicting using TextBlob model...")
     predictions = predict_textblob(X_test)
     accuracy = accuracy_score(y_test, predictions)
     f1 = f1_score(y_test, predictions)
@@ -112,10 +125,11 @@ def compare_all(X_test: pd.Series, y_test: pd.Series):
         "f1_score": f1,
         "predictions": predictions,
     }
+    print("> TextBlob model prediction done.")
 
     # print results
     print("\n" + "=" * 40)
-    print("SUMMARY")
+    print("RESULTS SUMMARY")
     print("=" * 40)
     print(f"{'Model':<40} {'Accuracy':>12} {'F1 Score':>12}")
     print("-" * 40)
@@ -131,7 +145,7 @@ def compare_all(X_test: pd.Series, y_test: pd.Series):
 def main():
     # Download dataset
     path = kagglehub.dataset_download("snap/amazon-fine-food-reviews")
-    print("Path to dataset files:", path)
+    print("> Path to dataset files:", path)
 
     # Load dataset
     df = pr.loadData(path)
@@ -147,6 +161,7 @@ def main():
     # Train the model
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, stratify=y)
 
+    print("> preprocessing finished")
     compare_all(X_test, y_test)
 
 
