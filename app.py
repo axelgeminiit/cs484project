@@ -4,14 +4,14 @@ import pandas as pd
 from pathlib import Path
 import preprocessing as pr
 
-# Page configuration
+
 st.set_page_config(
     page_title="Amazon Review Sentiment Analyzer",
     page_icon="⭐",
     layout="wide"
 )
 
-# Custom CSS for better styling
+
 st.markdown("""
     <style>
     .main-header {
@@ -48,7 +48,7 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# Load model
+#model
 @st.cache_resource
 def load_model():
     model_path = Path("data/amazon_sentiment_lr_model.joblib")
@@ -62,7 +62,6 @@ def main():
     st.markdown('<div class="main-header">⭐ Amazon Review Sentiment Analyzer</div>', unsafe_allow_html=True)
     st.markdown('<div class="sub-header">AI-Powered Sentiment Analysis for Product Reviews</div>', unsafe_allow_html=True)
 
-    # Load model
     model = load_model()
 
     if model is None:
@@ -119,10 +118,10 @@ def main():
         analyze_button = st.button("🔍 Analyze Sentiment", type="primary", use_container_width=True)
 
         if analyze_button and review_text.strip():
-            # Preprocess the text
+            # Preprocess 
             cleaned_text = pr.cleanText(review_text)
 
-            # Make prediction
+            # prediction
             prediction = model.predict([cleaned_text])[0]
             probability = model.predict_proba([cleaned_text])[0]
 
