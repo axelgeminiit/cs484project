@@ -1,0 +1,15 @@
+[Unit]
+Description=Streamlit Amazon Sentiment Analyzer
+After=network.target
+
+[Service]
+Type=simple
+User=ubuntu
+WorkingDirectory=/home/ubuntu/cs484project
+Environment="PATH=/home/ubuntu/cs484project/venv/bin"
+ExecStart=/home/ubuntu/cs484project/venv/bin/streamlit run app.py --server.port 8501 --server.address 0.0.0.0 --server.headless true
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
